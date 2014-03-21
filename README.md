@@ -32,7 +32,7 @@ tarball = AndFeathers.build('redis') do |redis|
     attributes.file('default.rb') { '# default.rb content' }
   end
   redis.dir('recipes') do |recipes|
-    attributes.file('default.rb') { '# default.rb content' }
+    recipes.file('default.rb') { '# default.rb content' }
   end
   redis.dir('templates') do |templates|
     templates.dir('default')
