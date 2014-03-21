@@ -1,4 +1,4 @@
-require 'rubyzip'
+require 'zip'
 
 module AndFeathers
   class Zip
@@ -10,6 +10,13 @@ module AndFeathers
     # @return [StringIO]
     #
     def self.open(&block)
+      io = StringIO.new('')
+
+      ::Zip::OutputStream.write_buffer(io) do |zip|
+        block.call(new(zip))
+      end
+
+      io
     end
 
     #
@@ -28,6 +35,8 @@ module AndFeathers
     # @param file [AndFeathers::Archive::File]
     #
     def add_file(file)
+      @zip.put_next_entry(file.path)
+      @zip.write(file.read)
     end
 
     #
@@ -36,6 +45,7 @@ module AndFeathers
     # @param directory [AndFeathers::Archive::Directory]
     #
     def add_directory(directory)
+      @zip.put_next_entry(directory.path)
     end
   end
 end

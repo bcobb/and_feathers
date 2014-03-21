@@ -1,9 +1,8 @@
 require 'and_feathers'
-require 'and_feathers/gzipped_tarball'
-require 'support/in_memory_gzipped_tarball'
+require 'and_feathers/zip'
+require 'support/in_memory_zip'
 
-describe AndFeathers do
-
+describe AndFeathers::Zip do
   describe 'an archive with a base directory' do
     let(:archive) do
       AndFeathers.build('redis') do |redis|
@@ -38,21 +37,11 @@ describe AndFeathers do
       ]
     end
 
-    it 'iterates through each directory breadth-first' do
-      expect(archive.to_a.map(&:path)).to eql(tree)
-    end
-
-    it 'can build an in-memory tarred/gzipped IO stream' do
-      tarball = archive.to_io(AndFeathers::GzippedTarball)
-      reader = InMemoryGzippedTarball.new(tarball)
+    it 'can build an in-memory zip IO stream' do
+      zip = archive.to_io(AndFeathers::Zip)
+      reader = InMemoryZip.new(zip)
 
       expect(reader.to_a.map(&:first)).to eql(tree)
-      expect(reader.to_a.map(&:last).reject(&:empty?)).to eq([
-        'README contents',
-        'CHANGELOG contents',
-        'metadata.rb contents',
-        'default.rb contents'
-      ])
     end
   end
 
@@ -89,13 +78,9 @@ describe AndFeathers do
       ]
     end
 
-    it 'iterates through each directory breadth-first' do
-      expect(archive.to_a.map(&:path)).to eql(tree)
-    end
-
-    it 'can build an in-memory tarred/gzipped IO stream' do
-      tarball = archive.to_io(AndFeathers::GzippedTarball)
-      reader = InMemoryGzippedTarball.new(tarball)
+    it 'can build an in-memory zip IO stream' do
+      zip = archive.to_io(AndFeathers::Zip)
+      reader = InMemoryZip.new(zip)
 
       expect(reader.to_a.map(&:first)).to eql(tree)
       expect(reader.to_a.map(&:last).reject(&:empty?)).to eq([
