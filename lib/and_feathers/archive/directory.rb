@@ -1,14 +1,14 @@
-require 'and_feathers/tarball/contains_files'
-require 'and_feathers/tarball/contains_directories'
+require 'and_feathers/archive/contains_files'
+require 'and_feathers/archive/contains_directories'
 
 module AndFeathers
-  class Tarball
+  class Archive
     #
-    # Represents a Directory inside the tarball
+    # Represents a Directory inside the archive
     #
     class Directory
-      include Tarball::ContainsFiles
-      include Tarball::ContainsDirectories
+      include Archive::ContainsFiles
+      include Archive::ContainsDirectories
 
       attr_reader :name, :mode
 
@@ -25,7 +25,7 @@ module AndFeathers
       #
       # @param name [String] the directory name
       # @param mode [Fixnum] the directory mode
-      # @param parent [Directory, Tarball] the parent entity of this directory
+      # @param parent [Directory, Archive] the parent entity of this directory
       #
       def initialize(name, mode, parent)
         @name = name

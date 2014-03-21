@@ -1,5 +1,5 @@
 module AndFeathers
-  class Tarball
+  class Archive
     #
     # A module which gives instances of a class the +file+ DSL method
     #

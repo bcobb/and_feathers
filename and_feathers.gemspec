@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.version       = AndFeathers::VERSION
   spec.authors       = ["Brian Cobb"]
   spec.email         = ["bcobb@uwalumni.com"]
-  spec.summary       = %q{Declaratively build GZipped Tarballs in memory}
+  spec.summary       = %q{Declaratively build archives in-memory}
   spec.homepage      = "http://github.com/bcobb/and_feathers"
   spec.license       = "MIT"
 

@@ -1,5 +1,5 @@
 module AndFeathers
-  class Tarball
+  class Archive
     #
     # A module which gives instances of a class the +dir+ DSL method
     #
@@ -10,7 +10,7 @@ module AndFeathers
       # @param name [String] the directory name
       # @param mode [Fixnum] the directory mode
       #
-      # @yieldparam directory [Directory] the newly-created +Directory+
+      # @yieldparam directory [Archive::Directory] the newly-created +Directory+
       #
       def dir(name, mode = 16877, &block)
         Directory.new(name, mode, self).tap do |subdir|

@@ -1,10 +1,11 @@
 require 'and_feathers'
+require 'and_feathers/gzipped_tarball'
 require 'support/in_memory_gzipped_tarball'
 
 describe AndFeathers do
 
-  describe 'a tarball with a base directory' do
-    let(:tarball) do
+  describe 'an archive with a base directory' do
+    let(:archive) do
       AndFeathers.build('redis') do |redis|
         redis.dir('cookbooks') do |cookbooks|
           cookbooks.dir('redis') do |redis|
@@ -38,11 +39,12 @@ describe AndFeathers do
     end
 
     it 'iterates through each directory breadth-first' do
-      expect(tarball.to_a.map(&:path)).to eql(tree)
+      expect(archive.to_a.map(&:path)).to eql(tree)
     end
 
     it 'can build an in-memory tarred/gzipped IO stream' do
-      reader = InMemoryGzippedTarball.new(tarball.to_io)
+      tarball = archive.to_io(AndFeathers::GzippedTarball)
+      reader = InMemoryGzippedTarball.new(tarball)
 
       expect(reader.to_a.map(&:first)).to eql(tree)
       expect(reader.to_a.map(&:last).reject(&:empty?)).to eq([
@@ -54,8 +56,8 @@ describe AndFeathers do
     end
   end
 
-  describe 'a tarball without a base directory' do
-    let(:tarball) do
+  describe 'an archive without a base directory' do
+    let(:archive) do
       AndFeathers.build do |redis|
         redis.dir('cookbooks') do |cookbooks|
           cookbooks.dir('redis') do |redis|
@@ -88,11 +90,12 @@ describe AndFeathers do
     end
 
     it 'iterates through each directory breadth-first' do
-      expect(tarball.to_a.map(&:path)).to eql(tree)
+      expect(archive.to_a.map(&:path)).to eql(tree)
     end
 
     it 'can build an in-memory tarred/gzipped IO stream' do
-      reader = InMemoryGzippedTarball.new(tarball.to_io)
+      tarball = archive.to_io(AndFeathers::GzippedTarball)
+      reader = InMemoryGzippedTarball.new(tarball)
 
       expect(reader.to_a.map(&:first)).to eql(tree)
       expect(reader.to_a.map(&:last).reject(&:empty?)).to eq([

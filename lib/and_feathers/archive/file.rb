@@ -1,7 +1,7 @@
 module AndFeathers
-  class Tarball
+  class Archive
     #
-    # Represents a File inside the tarball
+    # Represents a File inside the archive
     #
     class File
       include Enumerable
@@ -22,7 +22,7 @@ module AndFeathers
       # @param name [String] the file name
       # @param mode [Fixnum] the file mode
       # @param content [Proc] a block which returns the file contents
-      # @param parent [Directory, Tarball] the entity which contains this file
+      # @param parent [Directory, Archive] the entity which contains this file
       #
       def initialize(name, mode, content, parent)
         @name = name
