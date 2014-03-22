@@ -2,6 +2,10 @@ require 'rubygems/package'
 require 'zlib'
 
 module AndFeathers
+  #
+  # Conforms to the interface expected by +Archive#to_io+ in the service of
+  # turning +Archive+s into gzipped tarballs
+  #
   class GzippedTarball
     #
     # Yields a +GzippedTarball+ ready for adding files and directories.

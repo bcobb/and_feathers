@@ -18,12 +18,26 @@ And then execute:
 
 ## Usage
 
-Suppose you want to create the equivalent of a Chef cookbook artifact created using knife:
+### Generating an IO stream of an actual archive
 
 ```ruby
 require 'and_feathers'
-require 'and_feathers/gzipped_tarball'
 require 'and_feathers/zip'
+require 'and_feathers/gzipped_tarball'
+
+tarball = AndFeathers.build('archive') do |root|
+  root.file('README')
+end
+
+tarball.to_io(AndFeathers::Zip)
+# or
+tarball.to_io(AndFeathers::GzippedTarball)
+```
+
+### Specify each directory and file individually
+
+```ruby
+require 'and_feathers'
 require 'json'
 
 tarball = AndFeathers.build('redis') do |redis|
@@ -40,9 +54,44 @@ tarball = AndFeathers.build('redis') do |redis|
     templates.dir('default')
   end
 end
-
-tarball.to_io(AndFeathers::GzippedTarball) # a gzipped, tarball StringIO
-tarball.to_io(AndFeathers::Zip) # a zipped StringIO
 ```
 
+### Specify directories and files by their paths
 
+```ruby
+require 'and_feathers'
+
+tarball = AndFeathers.build('rails_app') do |app|
+  app.file('README.md') { "README content" }
+  app.file('config/routes.rb') do
+    "root to: 'public#home'"
+  end
+  app.dir('app/controllers') do |controllers|
+    controllers.file('application_controller.rb') do
+      "class ApplicationController < ActionController:Base\nend"
+    end
+    controllers.file('public_controller.rb') do
+      "class PublicController < ActionController:Base\nend"
+    end
+  end
+  app.file('app/views/public/home.html.erb')
+end
+```
+
+### Load an existing directory as an Archive
+
+In the example below, we load the fixture directory at [`spec/fixtures/archiveme`](/tree/master/spec/fixtures/archiveme), add a `test` directory and file to its archive, and update its `lib` directory a couple of times.
+
+```ruby
+require 'and_feathers'
+
+tarball = AndFeathers.from_path('spec/fixtures/archiveme')
+tarball.file('test/basic_test.rb') { '# TODO: tests' }
+tarball.file('lib/archiveme/version.rb') do
+  "module Archiveme\n  VERSION = '1.0.0'\nend"
+end
+tarball.file('lib/archiveme.rb') do
+  # The Archiveme fixture is a class, so we'll change it to a module
+  "module Archiveme\nend"
+end
+```

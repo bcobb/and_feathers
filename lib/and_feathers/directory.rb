@@ -2,7 +2,7 @@ require 'and_feathers/sugar'
 
 module AndFeathers
   #
-  # Represents a Directory inside the archive
+  # Represents a Directory
   #
   class Directory
     include Sugar
@@ -62,7 +62,24 @@ module AndFeathers
       path.sub(/^#{Regexp.escape(relative_path)}\/?/, '')
     end
 
+    #
+    # Computes the union of this +Directory+ with another +Directory+. If the
+    # two directories have a file path in common, the file in the +other+
+    # +Directory+ takes precedence. If the two directories have a sub-directory
+    # path in common, the union's sub-directory path will be the union of those
+    # two sub-directories.
+    #
+    # @raise [ArgumentError] if the +other+ parameter is not a +Directory+
+    #
+    # @param other [Directory]
+    #
+    # @return [Directory]
+    #
     def |(other)
+      if !other.is_a?(Directory)
+        raise ArgumentError, "#{other} is not a Directory"
+      end
+
       self.dup.tap do |directory|
         other.files.each do |file|
           directory.add_file(file.dup)
@@ -74,16 +91,26 @@ module AndFeathers
           if existing_directory.nil?
             directory.add_directory(new_directory.dup)
           else
-            @directories[new_directory.name] = new_directory.dup | existing_directory.dup
+            directory.add_directory(new_directory.dup | existing_directory.dup)
           end
         end
       end
     end
 
+    #
+    # The +File+ entries which exist in this +Directory+
+    #
+    # @return [Array<File>]
+    #
     def files
       @files.values
     end
 
+    #
+    # The +Directory+ entries which exist in this +Directory+
+    #
+    # @return [Array<Directory>]
+    #
     def directories
       @directories.values
     end
@@ -103,11 +130,23 @@ module AndFeathers
       end
     end
 
+    #
+    # Sets the given +directory+'s parent to this +Directory+, and adds it as a
+    # child.
+    #
+    # @param directory [Directory]
+    #
     def add_directory(directory)
       @directories[directory.name] = directory
       directory.parent = self
     end
 
+    #
+    # Sets the given +file+'s parent to this +Directory+, and adds it as a
+    # child.
+    #
+    # @param file [File]
+    #
     def add_file(file)
       @files[file.name] = file
       file.parent = self

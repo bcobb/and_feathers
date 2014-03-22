@@ -1,6 +1,10 @@
 require 'zip'
 
 module AndFeathers
+  #
+  # Conforms to the interface expected by +Archive#to_io+ in the service of
+  # turning +Archive+s into .zip files
+  #
   class Zip
     #
     # Yields a +Zip+ ready for adding files and directories.

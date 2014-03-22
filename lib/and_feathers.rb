@@ -11,11 +11,11 @@ module AndFeathers
   # archive. If +base+ is given, the archive's contents will live inside a
   # directory with that name.
   #
-  # @param base [String] name of the base directory containing the archive's
+  # @param extract_to [String] name of the base directory containing the archive's
   #   contents
-  # @param base_mode [Fixnum] the mode of the base directory
+  # @param extraction_mode [Fixnum] the mode of the base directory
   #
-  # @yieldparam archive [AndFeathers::Directory]
+  # @yieldparam archive [Archive]
   #
   def self.build(extract_to = nil, extraction_mode = 16877, &block)
     extract_to ||= '.'
@@ -32,7 +32,7 @@ module AndFeathers
   #
   # @param path [String] path to the directory to archive
   #
-  # @yieldparam archive [AndFeathers::Directory] the loaded archive
+  # @yieldparam archive [Archive] the loaded archive
   #
   def self.from_path(path, &block)
     if !::File.exists?(path)
