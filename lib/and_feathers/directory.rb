@@ -32,8 +32,8 @@ module AndFeathers
       @name = name
       @mode = mode
       @parent = nil
-      @files = []
-      @directories = []
+      @files = {}
+      @directories = {}
     end
 
     #
@@ -62,19 +62,37 @@ module AndFeathers
       path.sub(/^#{Regexp.escape(relative_path)}\/?/, '')
     end
 
+    def files
+      @files.values
+    end
+
+    def directories
+      @directories.values
+    end
+
     #
     # Iterates through this +Directory+'s children depth-first
     #
     # @yieldparam child [File, Directory]
     #
     def each(&block)
-      @files.each(&block)
+      files.each(&block)
 
-      @directories.each do |subdirectory|
+      directories.each do |subdirectory|
         block.call(subdirectory)
 
         subdirectory.each(&block)
       end
+    end
+
+    def add_directory(directory)
+      @directories[directory.name] = directory
+      directory.parent = self
+    end
+
+    def add_file(file)
+      @files[file.name] = file
+      file.parent = self
     end
 
     #

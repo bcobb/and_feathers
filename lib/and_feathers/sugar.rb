@@ -39,7 +39,7 @@ module AndFeathers
 
       if name_parts.empty?
         Directory.new(name, mode).tap do |directory|
-          @directories << directory
+          add_directory(directory)
 
           block.call(directory) if block
         end
@@ -93,7 +93,7 @@ module AndFeathers
 
       if name_parts.empty?
         File.new(name, mode, content).tap do |file|
-          @files << file
+          add_file(file)
         end
       else
         dir(name_parts.join(::File::SEPARATOR)) do |parent|
