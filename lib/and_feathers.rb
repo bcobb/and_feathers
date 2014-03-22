@@ -1,4 +1,5 @@
-require 'and_feathers/archive'
+require 'and_feathers/file'
+require 'and_feathers/directory'
 require 'and_feathers/version'
 
 #
@@ -6,43 +7,40 @@ require 'and_feathers/version'
 #
 module AndFeathers
   #
-  # Builds a new +Archive+. If +base+ is not given, the archives's contents
+  # Builds a new archive. If +base+ is not given, the archives's contents
   # would be extracted to intermingle with whichever directory contains the
   # archive. If +base+ is given, the archive's contents will live inside a
-  # directory with that name. This is just a convenient way to have a +dir+
-  # call wrap the archive's contents
+  # directory with that name.
   #
   # @param base [String] name of the base directory containing the archive's
   #   contents
   # @param base_mode [Fixnum] the mode of the base directory
   #
-  # @yieldparam archive [Archive]
+  # @yieldparam archive [AndFeathers::Directory]
   #
   def self.build(base = nil, base_mode = 16877, &block)
     if base && base_mode
-      Archive.new.tap do |archive|
-        archive.dir(base, base_mode) do |dir|
-          block.call(dir)
-        end
+      Directory.new(base, base_mode).tap do |archive|
+        block.call(archive)
       end
     else
-      Archive.new.tap do |archive|
+      Directory.new('.', base_mode).tap do |archive|
         block.call(archive)
       end
     end
   end
 
   #
-  # Builds a new +Archive+ from the directory at the given +path+. The
+  # Builds a new archive from the directory at the given +path+. The
   # innermost directory is taken to be the parent folder of the archive's
   # contents.
   #
   # @param path [String] path to the directory to archive
   #
-  # @yieldparam archive [Archive] the loaded Archive
+  # @yieldparam archive [AndFeathers::Directory] the loaded archive
   #
   def self.from_path(path, &block)
-    if !File.exists?(path)
+    if !::File.exists?(path)
       raise ArgumentError, "#{path} does not exist"
     end
 
@@ -50,27 +48,28 @@ module AndFeathers
       ::File.directory?(path)
     end
 
-    base = path.split(::File::SEPARATOR).last
+    full_path = ::File.expand_path(path)
+    root = full_path.split(::File::SEPARATOR).last
+    mode = ::File.stat(full_path).mode
 
-    if base == '.'
-      base = ::File.expand_path(base).split(::File::SEPARATOR).last
-    end
+    Directory.new(root, mode).tap do |archive|
+      directories.map do |directory|
+        [
+          directory.sub(/^#{Regexp.escape(path)}\/?/, ''),
+          ::File.stat(directory).mode
+        ]
+      end.each do |directory, mode|
+        archive.dir(directory, mode)
+      end
 
-    Archive.new.tap do |archive|
-      archive.dir(base) do |base_dir|
-        directories.map do |directory|
-          directory.sub(/^#{Regexp.escape(path)}\/?/, '')
-        end.each do |directory|
-          base_dir.dir(directory)
-        end
+      files.each do |file|
+        mode = ::File.stat(file).mode
 
-        files.each do |file|
-          File.open(file, 'rb') do |io|
-            content = io.read
+        ::File.open(file, 'rb') do |io|
+          content = io.read
 
-            base_dir.file(file.sub(/^#{Regexp.escape(path)}\/?/, '')) do
-              content
-            end
+          archive.file(file.sub(/^#{Regexp.escape(path)}\/?/, ''), mode) do
+            content
           end
         end
       end

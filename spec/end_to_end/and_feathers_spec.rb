@@ -1,6 +1,6 @@
 require 'and_feathers'
 
-describe AndFeathers::Archive do
+describe AndFeathers do
 
   describe 'building an archive with a base directory' do
     let(:archive) do
@@ -23,16 +23,15 @@ describe AndFeathers::Archive do
 
     let(:tree) do
       [
-        './redis',
-        './redis/cookbooks',
-        './redis/cookbooks/redis',
-        './redis/cookbooks/redis/README',
-        './redis/cookbooks/redis/CHANGELOG',
-        './redis/cookbooks/redis/metadata.rb',
-        './redis/cookbooks/redis/recipes',
-        './redis/cookbooks/redis/recipes/default.rb',
-        './redis/cookbooks/redis/templates',
-        './redis/cookbooks/redis/templates/default'
+        'redis/cookbooks',
+        'redis/cookbooks/redis',
+        'redis/cookbooks/redis/README',
+        'redis/cookbooks/redis/CHANGELOG',
+        'redis/cookbooks/redis/metadata.rb',
+        'redis/cookbooks/redis/recipes',
+        'redis/cookbooks/redis/recipes/default.rb',
+        'redis/cookbooks/redis/templates',
+        'redis/cookbooks/redis/templates/default'
       ]
     end
 
@@ -41,7 +40,7 @@ describe AndFeathers::Archive do
     end
 
     it 'loads file content' do
-      files = archive.to_a.select { |e| e.is_a?(AndFeathers::Archive::File) }
+      files = archive.to_a.select { |e| e.is_a?(AndFeathers::File) }
       expect(files.map(&:read)).to eql(
         [
           'README contents',
@@ -91,7 +90,7 @@ describe AndFeathers::Archive do
     end
 
     it 'loads file content' do
-      files = archive.to_a.select { |e| e.is_a?(AndFeathers::Archive::File) }
+      files = archive.to_a.select { |e| e.is_a?(AndFeathers::File) }
       expect(files.map(&:read)).to eql(
         [
           'README contents',
@@ -106,10 +105,9 @@ describe AndFeathers::Archive do
   describe 'loading an archive from an existing tree' do
     let(:tree) do
       [
-        './archiveme',
-        './archiveme/README.md',
-        './archiveme/lib',
-        './archiveme/lib/archiveme.rb'
+        'archiveme/README.md',
+        'archiveme/lib',
+        'archiveme/lib/archiveme.rb'
       ]
     end
 
@@ -122,7 +120,7 @@ describe AndFeathers::Archive do
     it 'loads file content' do
       archive = AndFeathers.from_path('spec/fixtures/archiveme')
 
-      files = archive.to_a.select { |e| e.is_a?(AndFeathers::Archive::File) }
+      files = archive.to_a.select { |e| e.is_a?(AndFeathers::File) }
 
       expect(files.map(&:read)).to eql(
         ["# Hello\n", "class Archiveme\nend\n"]
@@ -147,16 +145,16 @@ describe AndFeathers::Archive do
 
     it 'yields the resulting archive for modification' do
       archive = AndFeathers.from_path('spec/fixtures/archiveme')
-      archive.file('archiveme/lib/archiveme/version.rb') do
+      archive.file('lib/archiveme/version.rb') do
         "class Archiveme\n  VERSION='0.0.1'\nend"
       end
 
       new_tree = [
-        './archiveme/lib/archiveme',
-        './archiveme/lib/archiveme/version.rb'
+        'archiveme/lib/archiveme',
+        'archiveme/lib/archiveme/version.rb'
       ]
 
-      old_tree = ['./archiveme/lib/archiveme.rb', './archiveme/README.md']
+      old_tree = ['archiveme/lib/archiveme.rb']
 
       expect(archive.to_a.map(&:path)).to eql(tree + new_tree - old_tree)
     end

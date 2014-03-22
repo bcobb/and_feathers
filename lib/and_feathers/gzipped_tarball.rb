@@ -29,7 +29,7 @@ module AndFeathers
 
     #
     # Creates a new +GzippedTarball+. Provides the interface required by
-    # +AndFeathers::Archive#to_io+
+    # +AndFeathers::Directory#to_io+
     #
     # @param tarball [Gem::Package::TarWriter]
     #
@@ -40,7 +40,7 @@ module AndFeathers
     #
     # Adds the given file to the tarball
     #
-    # @param file [AndFeathers::Archive::File]
+    # @param file [AndFeathers::File]
     #
     def add_file(file)
       @tarball.add_file(file.path, file.mode) do |tarred_file|
@@ -51,7 +51,7 @@ module AndFeathers
     #
     # Adds the given directory to the tarball
     #
-    # @param directory [AndFeathers::Archive::Directory]
+    # @param directory [AndFeathers::Directory]
     #
     def add_directory(directory)
       @tarball.mkdir(directory.path, directory.mode)

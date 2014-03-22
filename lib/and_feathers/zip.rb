@@ -32,7 +32,7 @@ module AndFeathers
     #
     # Adds the given file to the zip
     #
-    # @param file [AndFeathers::Archive::File]
+    # @param file [AndFeathers::File]
     #
     def add_file(file)
       @zip.put_next_entry(file.path)
@@ -42,7 +42,7 @@ module AndFeathers
     #
     # Adds the given directory to the zip
     #
-    # @param directory [AndFeathers::Archive::Directory]
+    # @param directory [AndFeathers::Directory]
     #
     def add_directory(directory)
       @zip.put_next_entry(directory.path)
