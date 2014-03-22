@@ -1,5 +1,3 @@
-require 'and_feathers/archive/file'
-require 'and_feathers/archive/directory'
 require 'and_feathers/archive'
 require 'and_feathers/version'
 
@@ -30,6 +28,34 @@ module AndFeathers
     else
       Archive.new.tap do |archive|
         block.call(archive)
+      end
+    end
+  end
+
+  def self.from_path(path)
+    directories, files = ::Dir[::File.join(path, '**/*')].partition do |path|
+      ::File.directory?(path)
+    end
+
+    base = path.split(File::SEPARATOR).last
+
+    Archive.new.tap do |archive|
+      archive.dir(base) do |base_dir|
+        directories.map do |directory|
+          directory.sub(/^#{Regexp.escape(path)}\/?/, '')
+        end.each do |directory|
+          base_dir.dir(directory)
+        end
+
+        files.each do |file|
+          File.open(file, 'rb') do |io|
+            content = io.read
+
+            base_dir.file(file.sub(/^#{Regexp.escape(path)}\/?/, '')) do
+              content
+            end
+          end
+        end
       end
     end
   end

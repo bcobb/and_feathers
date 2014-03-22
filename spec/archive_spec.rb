@@ -2,7 +2,7 @@ require 'and_feathers'
 
 describe AndFeathers::Archive do
 
-  describe 'an archive with a base directory' do
+  describe 'building an archive with a base directory' do
     let(:archive) do
       AndFeathers.build('redis') do |redis|
         redis.dir('cookbooks') do |cookbooks|
@@ -36,12 +36,24 @@ describe AndFeathers::Archive do
       ]
     end
 
-    it 'iterates through each directory breadth-first' do
+    it 'iterates through each directory depth-first' do
       expect(archive.to_a.map(&:path)).to eql(tree)
+    end
+
+    it 'loads file content' do
+      files = archive.to_a.select { |e| e.is_a?(AndFeathers::Archive::File) }
+      expect(files.map(&:read)).to eql(
+        [
+          'README contents',
+          'CHANGELOG contents',
+          'metadata.rb contents',
+          'default.rb contents'
+        ]
+      )
     end
   end
 
-  describe 'an archive without a base directory' do
+  describe 'building an archive without a base directory' do
     let(:archive) do
       AndFeathers.build do |redis|
         redis.dir('cookbooks') do |cookbooks|
@@ -74,8 +86,47 @@ describe AndFeathers::Archive do
       ]
     end
 
-    it 'iterates through each directory breadth-first' do
+    it 'iterates through each directory depth-first' do
       expect(archive.to_a.map(&:path)).to eql(tree)
+    end
+
+    it 'loads file content' do
+      files = archive.to_a.select { |e| e.is_a?(AndFeathers::Archive::File) }
+      expect(files.map(&:read)).to eql(
+        [
+          'README contents',
+          'CHANGELOG contents',
+          'metadata.rb contents',
+          'default.rb contents'
+        ]
+      )
+    end
+  end
+
+  describe 'loading an archive from an existing tree' do
+    let(:tree) do
+      [
+        './archiveme',
+        './archiveme/README.md',
+        './archiveme/lib',
+        './archiveme/lib/archiveme.rb'
+      ]
+    end
+
+    it 'iterates through a directory depth-first' do
+      archive = AndFeathers.from_path('spec/fixtures/archiveme')
+
+      expect(archive.to_a.map(&:path)).to eql(tree)
+    end
+
+    it 'loads file content' do
+      archive = AndFeathers.from_path('spec/fixtures/archiveme')
+
+      files = archive.to_a.select { |e| e.is_a?(AndFeathers::Archive::File) }
+
+      expect(files.map(&:read)).to eql(
+        ["# Hello\n", "class Archiveme\nend\n"]
+      )
     end
   end
 end

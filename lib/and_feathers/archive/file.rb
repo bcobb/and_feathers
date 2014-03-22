@@ -6,14 +6,17 @@ module AndFeathers
     class File
       include Enumerable
 
-      attr_reader :name, :mode
+      attr_reader :name, :mode, :content
 
       #
       # @!attribute [r] name
-      #   @return [String] the directory name
+      #   @return [String] the file's name
       #
       # @!attribute [r] mode
-      #   @return [Fixnum] the directory mode
+      #   @return [Fixnum] the file's mode
+      #
+      # @!attribute [r] content
+      #   @return [Fixnum] a block which returns the file's content
       #
 
       #
@@ -38,6 +41,10 @@ module AndFeathers
       #
       def path
         ::File.join(@parent.path, name)
+      end
+
+      def path_from(relative_path)
+        path.sub(/^#{Regexp.escape(relative_path)}\/?/, '')
       end
 
       #

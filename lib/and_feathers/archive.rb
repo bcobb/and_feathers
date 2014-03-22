@@ -1,13 +1,13 @@
-require 'and_feathers/archive/contains_files'
-require 'and_feathers/archive/contains_directories'
+require 'and_feathers/archive/file'
+require 'and_feathers/archive/directory'
+require 'and_feathers/archive/fake_filesystem_sugar'
 
 module AndFeathers
   #
   # The base archive representation
   #
   class Archive
-    include ContainsFiles
-    include ContainsDirectories
+    include FakeFileSystemSugar
     include Enumerable
 
     #
@@ -24,7 +24,7 @@ module AndFeathers
     #
     def initialize(path = '.')
       @path = path
-      @children = []
+      @children = {}
     end
 
     #
@@ -33,7 +33,7 @@ module AndFeathers
     # @yieldparam child [File, Directory]
     #
     def each(&block)
-      @children.each do |child|
+      @children.each do |_, child|
         block.call(child)
         child.each(&block)
       end

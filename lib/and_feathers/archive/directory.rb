@@ -1,5 +1,4 @@
-require 'and_feathers/archive/contains_files'
-require 'and_feathers/archive/contains_directories'
+require 'and_feathers/archive/fake_filesystem_sugar'
 
 module AndFeathers
   class Archive
@@ -7,8 +6,8 @@ module AndFeathers
     # Represents a Directory inside the archive
     #
     class Directory
-      include Archive::ContainsFiles
-      include Archive::ContainsDirectories
+      include Archive::FakeFileSystemSugar
+      include Enumerable
 
       attr_reader :name, :mode
 
@@ -31,7 +30,7 @@ module AndFeathers
         @name = name
         @mode = mode
         @parent = parent
-        @children = []
+        @children = {}
       end
 
       #
@@ -43,19 +42,23 @@ module AndFeathers
         ::File.join(@parent.path, name)
       end
 
+      def path_from(relative_path)
+        path.sub(/^#{Regexp.escape(relative_path)}\/?/, '')
+      end
+
       #
       # Iterates through this +Directory+'s children down to each leaf child.
       #
       # @yieldparam child [File, Directory]
       #
       def each(&block)
-        files, subdirectories = @children.partition do |child|
+        files, subdirectories = @children.partition do |_, child|
           child.is_a?(File)
         end
 
-        files.each(&block)
+        files.map(&:last).each(&block)
 
-        subdirectories.each do |subdirectory|
+        subdirectories.map(&:last).each do |subdirectory|
           block.call(subdirectory)
 
           subdirectory.each(&block)
