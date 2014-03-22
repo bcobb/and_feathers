@@ -8,7 +8,7 @@ module AndFeathers
     include Sugar
     include Enumerable
 
-    attr_reader :name, :mode, :children
+    attr_reader :name, :mode
     attr_writer :parent
 
     #
@@ -32,17 +32,8 @@ module AndFeathers
       @name = name
       @mode = mode
       @parent = nil
-      @children = {}
-    end
-
-    #
-    # Adds a child node to this directory
-    #
-    # @param entity [Directory, File]
-    #
-    def add_child(entity)
-      @children[entity.name] = entity
-      entity.parent = self
+      @files = []
+      @directories = []
     end
 
     #
@@ -77,13 +68,9 @@ module AndFeathers
     # @yieldparam child [File, Directory]
     #
     def each(&block)
-      files, subdirectories = @children.partition do |_, child|
-        child.is_a?(File)
-      end
+      @files.each(&block)
 
-      files.map(&:last).each(&block)
-
-      subdirectories.map(&:last).each do |subdirectory|
+      @directories.each do |subdirectory|
         block.call(subdirectory)
 
         subdirectory.each(&block)
