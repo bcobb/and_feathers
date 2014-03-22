@@ -3,6 +3,28 @@ require 'and_feathers/directory'
 
 module AndFeathers
   describe Directory do
+    it 'can be unioned with another directory' do
+      one = Directory.new
+      two = Directory.new
+      one.dir('a') do |a|
+        a.dir('b') do |b|
+          b.file('c')
+        end
+        a.dir('c')
+      end
+
+      two.dir('a') do |a|
+        a.dir('b') do |b|
+          b.file('d')
+        end
+      end
+
+      three = one | two
+
+      expect(three.to_a.map(&:path)).
+        to eql(['./a', './a/b', './a/b/c', './a/b/d', './a/c'])
+    end
+
     it 'allows for manually nesting directories' do
       archive = Directory.new
       archive.dir('a') do |a|

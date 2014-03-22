@@ -62,6 +62,24 @@ module AndFeathers
       path.sub(/^#{Regexp.escape(relative_path)}\/?/, '')
     end
 
+    def |(other)
+      self.dup.tap do |directory|
+        other.files.each do |file|
+          directory.add_file(file.dup)
+        end
+
+        other.directories.each do |new_directory|
+          existing_directory = @directories[new_directory.name]
+
+          if existing_directory.nil?
+            directory.add_directory(new_directory.dup)
+          else
+            @directories[new_directory.name] = new_directory.dup | existing_directory.dup
+          end
+        end
+      end
+    end
+
     def files
       @files.values
     end
