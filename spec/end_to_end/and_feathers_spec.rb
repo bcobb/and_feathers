@@ -128,5 +128,37 @@ describe AndFeathers::Archive do
         ["# Hello\n", "class Archiveme\nend\n"]
       )
     end
+
+    it 'iterates through "." in the same way' do
+      archive = []
+
+      Dir.chdir('spec/fixtures/archiveme') do
+        archive = AndFeathers.from_path('.')
+      end
+
+      expect(archive.to_a.map(&:path)).to eql(tree)
+    end
+
+    it 'raises when the given path does not exist' do
+      expect do
+        AndFeathers.from_path('app')
+      end.to raise_error(ArgumentError)
+    end
+
+    it 'yields the resulting archive for modification' do
+      archive = AndFeathers.from_path('spec/fixtures/archiveme')
+      archive.file('archiveme/lib/archiveme/version.rb') do
+        "class Archiveme\n  VERSION='0.0.1'\nend"
+      end
+
+      new_tree = [
+        './archiveme/lib/archiveme',
+        './archiveme/lib/archiveme/version.rb'
+      ]
+
+      old_tree = ['./archiveme/lib/archiveme.rb', './archiveme/README.md']
+
+      expect(archive.to_a.map(&:path)).to eql(tree + new_tree - old_tree)
+    end
   end
 end

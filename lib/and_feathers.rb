@@ -32,12 +32,29 @@ module AndFeathers
     end
   end
 
-  def self.from_path(path)
+  #
+  # Builds a new +Archive+ from the directory at the given +path+. The
+  # innermost directory is taken to be the parent folder of the archive's
+  # contents.
+  #
+  # @param path [String] path to the directory to archive
+  #
+  # @yieldparam archive [Archive] the loaded Archive
+  #
+  def self.from_path(path, &block)
+    if !File.exists?(path)
+      raise ArgumentError, "#{path} does not exist"
+    end
+
     directories, files = ::Dir[::File.join(path, '**/*')].partition do |path|
       ::File.directory?(path)
     end
 
-    base = path.split(File::SEPARATOR).last
+    base = path.split(::File::SEPARATOR).last
+
+    if base == '.'
+      base = ::File.expand_path(base).split(::File::SEPARATOR).last
+    end
 
     Archive.new.tap do |archive|
       archive.dir(base) do |base_dir|
@@ -57,6 +74,8 @@ module AndFeathers
           end
         end
       end
+
+      block.call(archive) if block
     end
   end
 end
