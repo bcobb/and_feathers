@@ -3,8 +3,6 @@ module AndFeathers
   # Represents a File inside the archive
   #
   class File
-    include Enumerable
-
     attr_reader :name, :mode, :content
     attr_writer :parent
 
@@ -63,15 +61,6 @@ module AndFeathers
     #
     def read
       @content.call
-    end
-
-    #
-    # +Enumerable+ interface which simply yields this +File+ to the block
-    #
-    # @yieldparam file [File]
-    #
-    def each(&block)
-      block.call(self)
     end
   end
 end
