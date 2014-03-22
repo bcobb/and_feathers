@@ -143,20 +143,20 @@ describe AndFeathers do
       end.to raise_error(ArgumentError)
     end
 
-    it 'yields the resulting archive for modification' do
+    it 'yields the resulting archive for modification', focus: true  do
       archive = AndFeathers.from_path('spec/fixtures/archiveme')
       archive.file('lib/archiveme/version.rb') do
         "class Archiveme\n  VERSION='0.0.1'\nend"
       end
+      archive.dir('tmp')
 
       new_tree = [
         './archiveme/lib/archiveme',
-        './archiveme/lib/archiveme/version.rb'
+        './archiveme/lib/archiveme/version.rb',
+        './archiveme/tmp'
       ]
 
-      old_tree = ['./archiveme/lib/archiveme.rb']
-
-      expect(archive.to_a.map(&:path)).to eql(tree + new_tree - old_tree)
+      expect(archive.to_a.map(&:path)).to eql(tree + new_tree)
     end
   end
 end

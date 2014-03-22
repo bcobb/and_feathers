@@ -1,5 +1,4 @@
-require 'and_feathers/file'
-require 'and_feathers/directory'
+require 'and_feathers/archive'
 require 'and_feathers/version'
 
 #
@@ -18,15 +17,11 @@ module AndFeathers
   #
   # @yieldparam archive [AndFeathers::Directory]
   #
-  def self.build(base = nil, base_mode = 16877, &block)
-    if base && base_mode
-      Directory.new(base, base_mode).tap do |archive|
-        block.call(archive)
-      end
-    else
-      Directory.new('.', base_mode).tap do |archive|
-        block.call(archive)
-      end
+  def self.build(extract_to = nil, extraction_mode = 16877, &block)
+    extract_to ||= '.'
+
+    Archive.new(extract_to, extraction_mode).tap do |archive|
+      block.call(archive)
     end
   end
 
@@ -49,10 +44,10 @@ module AndFeathers
     end
 
     full_path = ::File.expand_path(path)
-    root = full_path.split(::File::SEPARATOR).last
-    mode = ::File.stat(full_path).mode
+    extract_to = full_path.split(::File::SEPARATOR).last
+    extraction_mode = ::File.stat(full_path).mode
 
-    Directory.new(root, mode).tap do |archive|
+    Archive.new(extract_to, extraction_mode).tap do |archive|
       directories.map do |directory|
         [
           directory.sub(/^#{Regexp.escape(path)}\/?/, ''),
