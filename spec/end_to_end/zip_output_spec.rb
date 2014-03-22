@@ -24,16 +24,16 @@ describe AndFeathers::Zip do
 
     let(:tree) do
       [
-        'redis',
-        'redis/cookbooks',
-        'redis/cookbooks/redis',
-        'redis/cookbooks/redis/README',
-        'redis/cookbooks/redis/CHANGELOG',
-        'redis/cookbooks/redis/metadata.rb',
-        'redis/cookbooks/redis/recipes',
-        'redis/cookbooks/redis/recipes/default.rb',
-        'redis/cookbooks/redis/templates',
-        'redis/cookbooks/redis/templates/default'
+        './redis',
+        './redis/cookbooks',
+        './redis/cookbooks/redis',
+        './redis/cookbooks/redis/README',
+        './redis/cookbooks/redis/CHANGELOG',
+        './redis/cookbooks/redis/metadata.rb',
+        './redis/cookbooks/redis/recipes',
+        './redis/cookbooks/redis/recipes/default.rb',
+        './redis/cookbooks/redis/templates',
+        './redis/cookbooks/redis/templates/default'
       ]
     end
 

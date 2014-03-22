@@ -54,7 +54,11 @@ module AndFeathers
       if @parent
         ::File.join(@parent.path, name)
       else
-        name
+        if name != '.'
+          ::File.join('.', name)
+        else
+          name
+        end
       end
     end
 

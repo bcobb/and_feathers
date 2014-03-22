@@ -23,15 +23,15 @@ describe AndFeathers do
 
     let(:tree) do
       [
-        'redis/cookbooks',
-        'redis/cookbooks/redis',
-        'redis/cookbooks/redis/README',
-        'redis/cookbooks/redis/CHANGELOG',
-        'redis/cookbooks/redis/metadata.rb',
-        'redis/cookbooks/redis/recipes',
-        'redis/cookbooks/redis/recipes/default.rb',
-        'redis/cookbooks/redis/templates',
-        'redis/cookbooks/redis/templates/default'
+        './redis/cookbooks',
+        './redis/cookbooks/redis',
+        './redis/cookbooks/redis/README',
+        './redis/cookbooks/redis/CHANGELOG',
+        './redis/cookbooks/redis/metadata.rb',
+        './redis/cookbooks/redis/recipes',
+        './redis/cookbooks/redis/recipes/default.rb',
+        './redis/cookbooks/redis/templates',
+        './redis/cookbooks/redis/templates/default'
       ]
     end
 
@@ -105,9 +105,9 @@ describe AndFeathers do
   describe 'loading an archive from an existing tree' do
     let(:tree) do
       [
-        'archiveme/README.md',
-        'archiveme/lib',
-        'archiveme/lib/archiveme.rb'
+        './archiveme/README.md',
+        './archiveme/lib',
+        './archiveme/lib/archiveme.rb'
       ]
     end
 
@@ -150,11 +150,11 @@ describe AndFeathers do
       end
 
       new_tree = [
-        'archiveme/lib/archiveme',
-        'archiveme/lib/archiveme/version.rb'
+        './archiveme/lib/archiveme',
+        './archiveme/lib/archiveme/version.rb'
       ]
 
-      old_tree = ['archiveme/lib/archiveme.rb']
+      old_tree = ['./archiveme/lib/archiveme.rb']
 
       expect(archive.to_a.map(&:path)).to eql(tree + new_tree - old_tree)
     end
