@@ -18,20 +18,27 @@ And then execute:
 
 ## Usage
 
-### Generating an IO stream of an actual archive
+### Writing a file from an archive's `StringIO`
 
 ```ruby
 require 'and_feathers'
 require 'and_feathers/zip'
 require 'and_feathers/gzipped_tarball'
 
-tarball = AndFeathers.build('archive') do |root|
+# This is a simple archive
+archive = AndFeathers.build('archive') do |root|
   root.file('README')
 end
 
-tarball.to_io(AndFeathers::Zip)
+File.open('archive.tgz', 'w+') do |f|
+  f << archive.to_io(AndFeathers::Zip).read
+end
+
 # or
-tarball.to_io(AndFeathers::GzippedTarball)
+
+File.open('archive.zip', 'w+') do |f|
+  f << archive.to_io(AndFeathers::GzippedTarball).read
+end
 ```
 
 ### Specify each directory and file individually
@@ -40,7 +47,7 @@ tarball.to_io(AndFeathers::GzippedTarball)
 require 'and_feathers'
 require 'json'
 
-tarball = AndFeathers.build('redis') do |redis|
+archive = AndFeathers.build('redis') do |redis|
   redis.file('README.md') { "README content" }
   redis.file('metadata.json') { JSON.dump({}) }
   redis.file('metadata.rb') { "# metadata.rb content" }
@@ -61,7 +68,7 @@ end
 ```ruby
 require 'and_feathers'
 
-tarball = AndFeathers.build('rails_app') do |app|
+archive = AndFeathers.build('rails_app') do |app|
   app.file('README.md') { "README content" }
   app.file('config/routes.rb') do
     "root to: 'public#home'"
@@ -85,12 +92,12 @@ In the example below, we load the fixture directory at [`spec/fixtures/archiveme
 ```ruby
 require 'and_feathers'
 
-tarball = AndFeathers.from_path('spec/fixtures/archiveme')
-tarball.file('test/basic_test.rb') { '# TODO: tests' }
-tarball.file('lib/archiveme/version.rb') do
+archive = AndFeathers.from_path('spec/fixtures/archiveme')
+archive.file('test/basic_test.rb') { '# TODO: tests' }
+archive.file('lib/archiveme/version.rb') do
   "module Archiveme\n  VERSION = '1.0.0'\nend"
 end
-tarball.file('lib/archiveme.rb') do
+archive.file('lib/archiveme.rb') do
   # The Archiveme fixture is a class, so we'll change it to a module
   "module Archiveme\nend"
 end
