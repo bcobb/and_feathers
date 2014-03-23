@@ -8,7 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = AndFeathers::VERSION
   spec.authors       = ["Brian Cobb"]
   spec.email         = ["bcobb@uwalumni.com"]
-  spec.summary       = %q{Declaratively build archives in-memory}
+  spec.description   = %q{Declaratively and iteratively build archive structures which easily serialize to on-disk formats such as zip and tgz.}
+  spec.summary       = %q{In-memory archive structures}
   spec.homepage      = "http://github.com/bcobb/and_feathers"
   spec.license       = "MIT"
 

@@ -4,5 +4,5 @@ module AndFeathers
   # introduces the change to a configurable output format, which breaks the
   # interface of the initial release.
   #
-  VERSION = "1.0.0"
+  VERSION = "1.0.0.pre"
 end
