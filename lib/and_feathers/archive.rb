@@ -74,6 +74,9 @@ module AndFeathers
     #   format = AndFeathers::GzippedTarball
     #   AndFeathers::Archive.new('test', 16877).to_io(format)
     #
+    # @see https://github.com/bcobb/and_feathers-gzipped_tarball
+    # @see https://github.com/bcobb/and_feathers-zip
+    #
     # @param package_type [.open,#add_file,#add_directory]
     #
     # @return [StringIO]

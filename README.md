@@ -1,14 +1,10 @@
 # AndFeathers
 
-Declaratively build in-memory archive structures. Use with [`and_feathers-gzipped_tarball`](https://github.com/bcobb/and_feathers-gzipped_tarball) and/or [`and_feathers-zip`](https://github.com/bcobb/and_feathers-zip) to generate artifacts.
+Declaratively and iteratively build in-memory archive structures.
 
 ## Installation
 
-Either run:
-
-    $ gem install and_feathers
-
-Or, if you're using Bundler, add this line to your application's Gemfile:
+Add this line to your application's Gemfile:
 
     gem 'and_feathers'
 
@@ -16,30 +12,20 @@ And then execute:
 
     $ bundle
 
+Or install it yourself as:
+
+    $ gem install and_feathers
+
 ## Usage
 
-### Writing a file from an archive's `StringIO`
+The examples below focus on specifying an archive's structure using `and_feathers`. See:
 
-```ruby
-require 'and_feathers'
-require 'and_feathers/zip'
-require 'and_feathers/gzipped_tarball'
+* [`and_feathers-gzipped_tarball`](https://github.com/bcobb/and_feathers-gzipped_tarball) for notes on writing a `.tgz` file to disk
+* [`and_feathers-zip`](https://github.com/bcobb/and_feathers-zip) for notes on writing a `.zip` file to disk
 
-# This is a simple archive
-archive = AndFeathers.build('archive') do |root|
-  root.file('README')
-end
+Once you're "inside" `and_feathers`, either because you've called `AndFeathers.build` or `AndFeathers.from_path`, the two main methods you'll call on block parameters are `file` and `dir`. These, as you might suspect, create file and directory entries, respectively.
 
-File.open('archive.tgz', 'w+') do |f|
-  f << archive.to_io(AndFeathers::Zip).read
-end
-
-# or
-
-File.open('archive.zip', 'w+') do |f|
-  f << archive.to_io(AndFeathers::GzippedTarball).read
-end
-```
+The examples below show how you might use these two methods to build up directory structures.
 
 ### Specify each directory and file individually
 
@@ -87,7 +73,7 @@ end
 
 ### Load an existing directory as an Archive
 
-In the example below, we load the fixture directory at [`spec/fixtures/archiveme`](/tree/master/spec/fixtures/archiveme), add a `test` directory and file to its archive, and update its `lib` directory a couple of times.
+In the example below, we load the fixture directory at [`spec/fixtures/archiveme`](/spec/fixtures/archiveme), and then use `and_feathers` to perform surgery on the in-memory archive. In particular, we add a `test` directory and file to its archive, and update its `lib` directory a couple of times.
 
 ```ruby
 require 'and_feathers'
@@ -98,7 +84,7 @@ archive.file('lib/archiveme/version.rb') do
   "module Archiveme\n  VERSION = '1.0.0'\nend"
 end
 archive.file('lib/archiveme.rb') do
-  # The Archiveme fixture is a class, so we'll change it to a module
+  # The Archiveme fixture is a class, but we'll change it to a module
   "module Archiveme\nend"
 end
 ```
