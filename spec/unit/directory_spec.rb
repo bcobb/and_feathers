@@ -5,19 +5,13 @@ module AndFeathers
   describe Directory do
     it 'can be unioned with another directory' do
       one = Directory.new
-      two = Directory.new
       one.dir('a') do |a|
-        a.dir('b') do |b|
-          b.file('c')
-        end
+        a.file('b/c')
         a.dir('c')
       end
 
-      two.dir('a') do |a|
-        a.dir('b') do |b|
-          b.file('d')
-        end
-      end
+      two = Directory.new
+      two.file('a/b/d')
 
       three = one | two
 
@@ -26,43 +20,43 @@ module AndFeathers
     end
 
     it 'allows for manually nesting directories' do
-      archive = Directory.new
-      archive.dir('a') do |a|
+      directory = Directory.new
+      directory.dir('a') do |a|
         a.dir('b') do |b|
           b.dir('c')
         end
       end
 
-      expect(archive.to_a.map(&:path)).to eql(['./a', './a/b', './a/b/c'])
+      expect(directory.to_a.map(&:path)).to eql(['./a', './a/b', './a/b/c'])
     end
 
     it 'allows for convenient nesting of directories' do
-      archive = Directory.new
-      archive.dir('a/b/c')
+      directory = Directory.new
+      directory.dir('a/b/c')
 
-      expect(archive.to_a.map(&:path)).to eql(['./a', './a/b', './a/b/c'])
+      expect(directory.to_a.map(&:path)).to eql(['./a', './a/b', './a/b/c'])
     end
 
     it 'only creates a given path once' do
-      archive = Directory.new
-      archive.dir('a/b/c')
-      archive.dir('a/b/c/d')
+      directory = Directory.new
+      directory.dir('a/b/c')
+      directory.dir('a/b/c/d')
 
-      expect(archive.to_a.map(&:path)).
+      expect(directory.to_a.map(&:path)).
         to eql(['./a', './a/b', './a/b/c', './a/b/c/d'])
     end
 
     it 'takes the most recent duplicate directory as authoritative' do
-      archive = Directory.new
-      archive.dir('a/b/c')
-      archive.dir('a/b/d')
+      directory = Directory.new
+      directory.dir('a/b/c')
+      directory.dir('a/b/d')
 
-      expect(archive.to_a.map(&:path)).to eql(['./a', './a/b', './a/b/d'])
+      expect(directory.to_a.map(&:path)).to eql(['./a', './a/b', './a/b/d'])
     end
 
     it 'allows for manually nesting files in directories' do
-      archive = Directory.new
-      archive.dir('a') do |a|
+      directory = Directory.new
+      directory.dir('a') do |a|
         a.dir('b') do |b|
           b.dir('c') do |c|
             c.file 'README'
@@ -70,32 +64,32 @@ module AndFeathers
         end
       end
 
-      expect(archive.to_a.map(&:path)).
+      expect(directory.to_a.map(&:path)).
         to eql(['./a', './a/b', './a/b/c', './a/b/c/README'])
     end
 
     it 'allows for convenient nesting of files in directories' do
-      archive = Directory.new
-      archive.file('a/b/c/README')
+      directory = Directory.new
+      directory.file('a/b/c/README')
 
-      expect(archive.to_a.map(&:path)).
+      expect(directory.to_a.map(&:path)).
         to eql(['./a', './a/b', './a/b/c', './a/b/c/README'])
     end
 
     it 'only creates a given file once' do
-      archive = Directory.new
-      archive.file('a/README')
-      archive.file('a/README')
+      directory = Directory.new
+      directory.file('a/README')
+      directory.file('a/README')
 
-      expect(archive.to_a.map(&:path)).to eql(['./a', './a/README'])
+      expect(directory.to_a.map(&:path)).to eql(['./a', './a/README'])
     end
 
     it 'takes the most recent file as the authoritative file' do
-      archive = Directory.new
-      archive.file('a/README') { '1' }
-      archive.file('a/README') { '2' }
+      directory = Directory.new
+      directory.file('a/README') { '1' }
+      directory.file('a/README') { '2' }
 
-      readme = archive.to_a.find { |e| e.is_a?(File) }
+      readme = directory.to_a.find { |e| e.is_a?(File) }
 
       expect(readme.read).to eql('2')
     end
