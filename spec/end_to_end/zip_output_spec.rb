@@ -24,16 +24,16 @@ describe AndFeathers::Zip do
 
     let(:tree) do
       [
-        './redis',
-        './redis/cookbooks',
-        './redis/cookbooks/redis',
+        './redis/',
+        './redis/cookbooks/',
+        './redis/cookbooks/redis/',
         './redis/cookbooks/redis/README',
         './redis/cookbooks/redis/CHANGELOG',
         './redis/cookbooks/redis/metadata.rb',
-        './redis/cookbooks/redis/recipes',
+        './redis/cookbooks/redis/recipes/',
         './redis/cookbooks/redis/recipes/default.rb',
-        './redis/cookbooks/redis/templates',
-        './redis/cookbooks/redis/templates/default'
+        './redis/cookbooks/redis/templates/',
+        './redis/cookbooks/redis/templates/default/'
       ]
     end
 
@@ -42,6 +42,23 @@ describe AndFeathers::Zip do
       reader = InMemoryZip.new(zip)
 
       expect(reader.to_a.map(&:first)).to eql(tree)
+    end
+
+    it 'produces an in-memory IO stream that can be saved to disk' do
+      file = ::File.join("spec", "tmp", "#{Time.now.to_f}.zip")
+      zip = archive.to_io(AndFeathers::Zip)
+
+      ::File.open(file, 'w+') { |f| f << zip.read }
+
+      zipped_files = []
+
+      ::Zip::File.open(file) do |files|
+        files.each do |file|
+          zipped_files << file.name
+        end
+      end
+
+      expect(zipped_files).to eql(tree)
     end
   end
 
@@ -66,16 +83,16 @@ describe AndFeathers::Zip do
 
     let(:tree) do
       [
-        '.',
-        './cookbooks',
-        './cookbooks/redis',
+        './',
+        './cookbooks/',
+        './cookbooks/redis/',
         './cookbooks/redis/README',
         './cookbooks/redis/CHANGELOG',
         './cookbooks/redis/metadata.rb',
-        './cookbooks/redis/recipes',
+        './cookbooks/redis/recipes/',
         './cookbooks/redis/recipes/default.rb',
-        './cookbooks/redis/templates',
-        './cookbooks/redis/templates/default'
+        './cookbooks/redis/templates/',
+        './cookbooks/redis/templates/default/'
       ]
     end
 
@@ -90,6 +107,23 @@ describe AndFeathers::Zip do
         'metadata.rb contents',
         'default.rb contents'
       ])
+    end
+
+    it 'produces an in-memory IO stream that can be saved to disk' do
+      file = ::File.join("spec", "tmp", "#{Time.now.to_f}.zip")
+      zip = archive.to_io(AndFeathers::Zip)
+
+      ::File.open(file, 'w+') { |f| f << zip.read }
+
+      zipped_files = []
+
+      ::Zip::File.open(file) do |files|
+        files.each do |file|
+          zipped_files << file.name
+        end
+      end
+
+      expect(zipped_files).to eql(tree)
     end
   end
 end

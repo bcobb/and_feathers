@@ -2,3 +2,4 @@
 -I lib
 --color
 -r byebug
+-r support/cleanliness

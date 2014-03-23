@@ -18,9 +18,7 @@ module AndFeathers
 
       ::Zip::OutputStream.write_buffer(io) do |zip|
         block.call(new(zip))
-      end
-
-      io
+      end.tap(&:rewind)
     end
 
     #
@@ -49,7 +47,7 @@ module AndFeathers
     # @param directory [AndFeathers::Directory]
     #
     def add_directory(directory)
-      @zip.put_next_entry(directory.path)
+      @zip.put_next_entry(::File.join(directory.path, ''))
     end
   end
 end

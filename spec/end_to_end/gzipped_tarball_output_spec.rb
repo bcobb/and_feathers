@@ -50,6 +50,18 @@ describe AndFeathers do
         'default.rb contents'
       ])
     end
+
+    it 'produces an in-memory IO stream that can be saved to disk' do
+      file = ::File.join("spec", "tmp", "#{Time.now.to_f}.tgz")
+
+      tarball = archive.to_io(AndFeathers::GzippedTarball)
+
+      ::File.open(file, 'w+') { |f| f << tarball.read }
+
+      reader = InMemoryGzippedTarball.new(::File.open(file))
+
+      expect(reader.to_a.map(&:first)).to eql(tree)
+    end
   end
 
   describe 'an archive without a base directory' do
@@ -97,6 +109,18 @@ describe AndFeathers do
         'metadata.rb contents',
         'default.rb contents'
       ])
+    end
+
+    it 'produces an in-memory IO stream that can be saved to disk' do
+      file = ::File.join("spec", "tmp", "#{Time.now.to_f}.tgz")
+
+      tarball = archive.to_io(AndFeathers::GzippedTarball)
+
+      ::File.open(file, 'w+') { |f| f << tarball.read }
+
+      reader = InMemoryGzippedTarball.new(::File.open(file))
+
+      expect(reader.to_a.map(&:first)).to eql(tree)
     end
   end
 end
