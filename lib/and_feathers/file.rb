@@ -4,7 +4,7 @@ module AndFeathers
   #
   class File
     attr_reader :name, :mode, :content
-    attr_writer :parent
+    attr_accessor :parent
 
     #
     # @!attribute [r] name
@@ -31,6 +31,17 @@ module AndFeathers
       @name = name
       @mode = mode
       @content = content
+      @parent = nil
+    end
+
+    #
+    # Reset +parent+ when calling +dup+ or +clone+ on a +File+
+    #
+    # @param source [File]
+    #
+    def initialize_copy(source)
+      super
+
       @parent = nil
     end
 

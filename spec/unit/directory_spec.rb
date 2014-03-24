@@ -3,20 +3,96 @@ require 'and_feathers/directory'
 
 module AndFeathers
   describe Directory do
-    it 'can be unioned with another directory' do
-      one = Directory.new
-      one.dir('a') do |a|
-        a.file('b/c')
-        a.dir('c')
+    describe 'dupping/cloning' do
+      it 'does not preserve the parent relationship' do
+        one = Directory.new.tap { |d| d.file('a/b/c') }
+
+        b = one.find { |e| e.name == 'b' }
+
+        expect(b.dup.parent).to be_nil
+      end
+    end
+
+    describe '#|' do
+      it 'unions the contents of two directories' do
+        one = Directory.new
+        one.dir('a') do |a|
+          a.file('b/c')
+          a.dir('c')
+        end
+
+        two = Directory.new
+        two.file('a/b/d')
+
+        three = one | two
+
+        expect(three.to_a.map(&:path)).
+          to eql(['./a', './a/b', './a/b/c', './a/b/d', './a/c'])
       end
 
-      two = Directory.new
-      two.file('a/b/d')
+      it 'does not mutate the left-hand side files' do
+        one = Directory.new.tap { |o| o.file('a/b') }
+        two = Directory.new.tap { |t| t.file('a/c') ; t.file('d/e') }
 
-      three = one | two
+        one_a = one.to_a.find { |e| e.name == 'a' }
 
-      expect(three.to_a.map(&:path)).
-        to eql(['./a', './a/b', './a/b/c', './a/b/d', './a/c'])
+        expect do
+          one | two
+        end.to_not change(one_a, :files)
+      end
+
+      it 'does not mutate the right-hand side files' do
+        one = Directory.new.tap { |o| o.file('a/b') }
+        two = Directory.new.tap { |t| t.file('a/c') ; t.file('d/e') }
+
+        two_a = one.to_a.find { |e| e.name == 'a' }
+
+        expect do
+          one | two
+        end.to_not change(two_a, :files)
+      end
+
+      it 'does not mutate the left-hand side directories' do
+        one = Directory.new.tap { |o| o.file('a/b') }
+        two = Directory.new.tap { |t| t.file('a/c') ; t.file('d/e') }
+
+        expect do
+          one | two
+        end.to_not change(one, :directories)
+      end
+
+      it 'does not mutate the right-hand side directories' do
+        one = Directory.new.tap { |o| o.file('a/b') }
+        two = Directory.new.tap { |t| t.file('a/c') ; t.file('d/e') }
+
+        expect do
+          one | two
+        end.to_not change(two, :directories)
+      end
+
+      it 'does not mutate the left-hand side parents' do
+        one = Directory.new.tap { |o| o.file('a/b') ; o.file('f/g') }
+        two = Directory.new.tap { |t| t.file('a/c') ; t.file('d/e') }
+
+        one_f = one.to_a.find { |e| e.name == 'f' }
+        one_f_parent = one_f.parent
+
+        one | two
+
+        expect(one_f_parent).to eql(one_f.parent)
+      end
+
+      it 'does not mutate the right-hand side parents' do
+        one = Directory.new.tap { |o| o.file('a/b') }
+        two = Directory.new.tap { |t| t.file('a/c') ; t.file('d/e') }
+
+        two_d = two.to_a.find { |e| e.name == 'd' }
+        two_d_parent = two_d.parent
+
+        one | two
+
+        expect(two_d.parent).to eql(two_d_parent)
+      end
     end
 
     it 'allows for manually nesting directories' do

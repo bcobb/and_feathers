@@ -9,7 +9,7 @@ module AndFeathers
     include Enumerable
 
     attr_reader :name, :mode
-    attr_writer :parent
+    attr_accessor :parent
 
     #
     # @!attribute [r] name
@@ -34,6 +34,28 @@ module AndFeathers
       @parent = nil
       @files = {}
       @directories = {}
+    end
+
+    #
+    # Reset +parent+ and clone +files+ and +directories+ when calling +dup+ or
+    # +clone+ on a +Directory+
+    #
+    # @param source [Directory]
+    #
+    def initialize_copy(source)
+      super
+
+      @files = {}
+      @directories = {}
+      @parent = nil
+
+      source.directories.map(&:dup).each do |new_directory|
+        add_directory(new_directory)
+      end
+
+      source.files.map(&:dup).each do |new_file|
+        add_file(new_file)
+      end
     end
 
     #
@@ -80,7 +102,7 @@ module AndFeathers
         raise ArgumentError, "#{other} is not a Directory"
       end
 
-      self.dup.tap do |directory|
+      dup.tap do |directory|
         other.files.each do |file|
           directory.add_file(file.dup)
         end
@@ -91,7 +113,7 @@ module AndFeathers
           if existing_directory.nil?
             directory.add_directory(new_directory.dup)
           else
-            directory.add_directory(new_directory.dup | existing_directory.dup)
+            directory.add_directory(new_directory | existing_directory)
           end
         end
       end
