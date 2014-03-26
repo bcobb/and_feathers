@@ -1,4 +1,4 @@
 -I spec
 -I lib
 --color
---order random
+-r byebug

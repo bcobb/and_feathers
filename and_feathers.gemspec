@@ -8,13 +8,13 @@ Gem::Specification.new do |spec|
   spec.version       = AndFeathers::VERSION
   spec.authors       = ["Brian Cobb"]
   spec.email         = ["bcobb@uwalumni.com"]
-  spec.summary       = %q{Declaratively build GZipped Tarballs in memory}
+  spec.description   = %q{Declaratively and iteratively build archive structures which easily serialize to on-disk formats such as zip and tgz.}
+  spec.summary       = %q{In-memory archive structures}
   spec.homepage      = "http://github.com/bcobb/and_feathers"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files`.split($/)
-  spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
-  spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
+  spec.test_files    = spec.files.grep(%r{^spec/})
   spec.require_paths = ["lib"]
 
   spec.add_development_dependency "bundler", "~> 1.3"
