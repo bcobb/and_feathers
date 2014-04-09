@@ -34,7 +34,7 @@ module AndFeathers
   #
   # @yieldparam archive [Archive] the loaded archive
   #
-  def self.from_path(path, &block)
+  def self.from_path(path, extract_to = nil, &block)
     if !::File.exists?(path)
       raise ArgumentError, "#{path} does not exist"
     end
@@ -44,7 +44,7 @@ module AndFeathers
     end
 
     full_path = ::File.expand_path(path)
-    extract_to = full_path.split(::File::SEPARATOR).last
+    extract_to = full_path.split(::File::SEPARATOR).last if extract_to.nil?
     extraction_mode = ::File.stat(full_path).mode
 
     Archive.new(extract_to, extraction_mode).tap do |archive|
