@@ -81,11 +81,11 @@ module AndFeathers
     #
     # @return [StringIO]
     #
-    def to_io(package_type)
+    def to_io(package_type, traversal = :each)
       package_type.open do |package|
         package.add_directory(@initial_version)
 
-        each do |child|
+        send(traversal) do |child|
           case child
           when File
             package.add_file(child)
